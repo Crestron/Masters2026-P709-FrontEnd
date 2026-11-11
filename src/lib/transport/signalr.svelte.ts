@@ -41,7 +41,7 @@ import {
   type LightLoadPosition,
   type LightPreset
 } from '../stores/lights.svelte';
-import { applyRoomName } from '../stores/room.svelte';
+import { applyRoomName, applyRoomSvg } from '../stores/room.svelte';
 import {
   applyShades,
   applyShadePresets,
@@ -143,7 +143,7 @@ export function initSignalR(url: string): void {
         ctx.previousRetryCount < 10 ? 1000 : 5000
     })
     .build();
-  // REF UI Lab 1.1 – End
+  // REF UI Lab 1.1 - End
 
   // ---------------------------------------------------------------------------
   // Inbound: server pushed a page change
@@ -268,6 +268,21 @@ function applyRoomConfiguration(config: unknown): void {
   } else {
     console.warn('SignalR: bad GetRoomConfiguration roomName payload', roomName);
   }
+  // TODO: UI Lab 3.1a - Decode the Base64 Room layout to an SVG
+  // Hint: It's called roomSvg
+  // UI Lab 3.1a - End
+
+  // REF: Lab 3.1a
+  const roomSvg = (config as { roomSvg?: unknown } | null)?.roomSvg;
+
+  const decodedRoomSvg = typeof roomSvg === 'string' ? decodeBase64Svg(roomSvg) : null;
+
+  if (decodedRoomSvg) {
+    applyRoomSvg(decodedRoomSvg);
+  } else {
+    console.warn('SignalR: bad GetRoomConfiguration roomSvg payload', roomSvg);
+  }
+  // REF: Lab 3.1a - End
 
   const sources = (config as { sources?: unknown } | null)?.sources;
 

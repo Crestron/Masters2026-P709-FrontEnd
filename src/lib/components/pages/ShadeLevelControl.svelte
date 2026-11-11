@@ -51,7 +51,8 @@
   </div>
   <!-- TODO: UI Lab 1.5ab - Add a slider to control the shade position -->
   <!-- Hint: Use an input of type range. Bind its value to the current draft or reported percentage. -->
-  <!-- UI Lab 1.5ab - End -->
+  <!-- UI Lab 1.5b - End -->
+
   <!-- REF: UI Lab 1.5ab -->
   <input
     type="range"

@@ -339,6 +339,7 @@
             <!-- TODO: UI Lab 1.5aa - Add the shade selection button -->
             <!-- Hint: Use a button with class "scope-tab" and bind its active state to selectedScope -->
             <!-- UI Lab 1.5aa - End -->
+
             <!-- REF: UI Lab 1.5aa -->
             <button
               type="button"

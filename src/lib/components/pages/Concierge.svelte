@@ -7,7 +7,17 @@
     conciergeConfigState,
     conciergeState,
   } from "../../stores/concierge.svelte";
-  import { startConcierge } from "../../transport/concierge";
+  import {
+    sendConciergeRequest,
+    startConcierge,
+  } from "../../transport/concierge";
+
+  const STATUS_TEXT: Record<string, string> = {
+    idle: "Tap to request",
+    sending: "Sending request…",
+    confirmed: "Request confirmed ✓",
+    failed: "Request failed — try again",
+  };
 
   $effect(() => {
     const config = conciergeConfigState.current;
@@ -44,7 +54,38 @@
           </p>{/if}
         <p class="concierge__hint">Select a service to send a request.</p>
         <div class="requests" role="group" aria-label="Service requests">
-          {#each conciergeState.requests as request (request.uid)}{/each}
+          {#each conciergeState.requests as request (request.uid)}
+            <!-- TODO: UI Lab 3.2 - Add the request button -->
+            <!-- Hint: The possible request statuses are 'idle', 'sending', 'confirmed', and 'failed' -->
+            <!-- UI Lab 3.2 - End -->
+
+            <!-- REF: UI Lab 3.2 -->
+            <button
+              class="request-button"
+              class:request-button--sending={request.status === "sending"}
+              class:request-button--confirmed={request.status === "confirmed"}
+              class:request-button--failed={request.status === "failed"}
+              onclick={() => sendConciergeRequest(request)}
+              disabled={request.status !== "idle"}
+            >
+              {#if request.icon}
+                <img
+                  class="request-icon"
+                  src="data:image/svg+xml;base64,{request.icon}"
+                  alt=""
+                />
+              {/if}
+              <span class="request-label">{request.name}</span>
+              <span class="request-description">{request.description}</span>
+              <span class="request-status" role="status">
+                {#if request.status === "sending"}
+                  <span class="request-spinner" aria-hidden="true"></span>
+                {/if}
+                {request.message || STATUS_TEXT[request.status]}
+              </span>
+            </button>
+            <!-- REF: UI Lab 3.2 - End -->
+          {/each}
         </div>
       {/if}
     </Card>
@@ -110,6 +151,95 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 0.75rem;
+  }
+
+  .request-button {
+    appearance: none;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    background: rgb(var(--surface-hi) / 0.5);
+    border: 1px solid rgb(var(--ink) / 0.15);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    transition:
+      border-color 200ms,
+      background 200ms,
+      opacity 200ms,
+      transform 80ms;
+  }
+  .request-button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .request-button:not(:disabled):hover {
+    border-color: rgb(var(--accent-rgb) / 0.7);
+  }
+
+  /* A slot showing its own progress/result is disabled but NOT greyed out —
+     its state colouring below is the feedback. */
+  .request-button:disabled {
+    cursor: default;
+  }
+
+  .request-button--sending {
+    border-color: rgb(var(--accent-rgb));
+    background: rgb(var(--accent-rgb) / 0.12);
+  }
+
+  .request-button--confirmed {
+    border-color: #4ade80;
+    background: rgb(74 222 128 / 0.1);
+  }
+
+  .request-button--failed {
+    border-color: #f87171;
+    background: rgb(248 113 113 / 0.1);
+  }
+
+  .request-label {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .request-icon {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+  .request-description {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+
+  .request-status {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    opacity: 0.65;
+  }
+
+  .request-button--confirmed .request-status {
+    color: #4ade80;
+    opacity: 1;
+  }
+  .request-button--failed .request-status {
+    color: #f87171;
+    opacity: 1;
+  }
+
+  .request-spinner {
+    flex-shrink: 0;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 2px solid rgb(var(--accent-rgb) / 0.3);
+    border-top-color: rgb(var(--accent-rgb));
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
   }
 
   @keyframes spin {

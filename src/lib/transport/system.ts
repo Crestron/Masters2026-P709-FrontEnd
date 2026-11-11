@@ -16,7 +16,8 @@ import { clearCurrentSource } from '../stores/sources.svelte';
 
 // TODO: UI Lab 1.5b - Hook up system power changes 
 // Hint: We need to react to 'SystemPowerStateChanged' messages from the hub.
-// UI Lab 1.5b - End
+// UI Lab 1.5c - End
+
 // REF UI Lab 1.5b
 // Inbound. Contract with the C# hub (RoomHub):
 //   Clients.All.SendAsync("SystemPowerStateChanged", "off" | "starting" | "on" | "stopping")

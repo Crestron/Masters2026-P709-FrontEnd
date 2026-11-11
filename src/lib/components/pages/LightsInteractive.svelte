@@ -30,6 +30,16 @@
 
   const roomAspectRatio = $derived(svgAspectRatio(roomState.roomSvg ?? ""));
 
+  // Returns inline style string for a fixture button based on its light level
+  function fixtureStyle(lightId: string): string {
+    const lv = level(lightId);
+    if (lv === 0) return "";
+    const color = getLevelColor(lv);
+    const glow = Math.round(8 + (lv / 100) * 18);
+    const spread = Math.round((lv / 100) * 7);
+    return `background:${color};border-color:${color};box-shadow:0 0 ${glow}px ${spread}px ${color}66;`;
+  }
+
   function level(lightId: string): number {
     return lightsState.levels[lightId] ?? 0;
   }
@@ -92,7 +102,6 @@
     return `${initial}${index + 1}`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fixtures = $derived(
     LOADS.flatMap((load) =>
       load.positions.map((pos, i): Fixture => ({
@@ -142,7 +151,16 @@
             contract's own sample does) — self-contained SVGs like the
             bundled default simply ignore it.
           -->
-          <div class="room-svg-layer" aria-hidden="true"></div>
+          <div class="room-svg-layer" aria-hidden="true">
+            <!-- TODO: UI Lab 3.1b - Display the SVG on the page -->
+            <!-- Hint:  -->
+            <!-- UI Lab 3.1b - End -->
+
+            <!-- REF: UI Lab 3.1b -->
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+            {@html roomState.roomSvg}
+            <!-- REF: UI Lab 3.1b -->
+          </div>
 
           <!--
             Interactive fixture buttons — one per physical fixture, driven
@@ -151,7 +169,25 @@
             pendant/recessed/wall-washer button groups, which only worked
             for exactly 4 known light ids.
           -->
-          <div class="fixtures-layer"></div>
+          <div class="fixtures-layer">
+            <!-- TODO UI Lab 3.1c - Display the fixture buttons -->
+            <!-- Hint: They are stored in fixtures -->
+            <!-- UI Lab 3.1c - End -->
+
+            <!-- REF: UI Lab 3.1c -->
+            {#each fixtures as f (f.key)}
+              <button
+                class="fixture"
+                style="top:{f.yPercent}%;left:{f.xPercent}%;{fixtureStyle(
+                  f.loadId,
+                )}"
+                onclick={() => toggle(f.loadId)}
+                aria-label="{f.label} fixture"
+                aria-pressed={isOn(f.loadId)}
+              ></button>
+            {/each}
+            <!-- REF: UI Lab 3.1c - End -->
+          </div>
         </div>
       </div>
     </Card>
@@ -506,10 +542,35 @@
     z-index: 10;
   }
 
+  .fixture {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid rgb(var(--line-hi) / 0.8);
+    cursor: pointer;
+    outline: none;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    background: rgb(var(--fixture-off) / 0.9);
+  }
+  .fixture:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+  .fixture:active {
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+
   @media (max-width: 700px) {
     /* The room itself renders smaller in the stacked (portrait-ish) layout
        (see .content's grid-template-rows above), so the fixture dots need
        to shrink to match — otherwise they'd look oversized relative to the
        room and start overlapping each other. */
+    .fixture {
+      width: 14px;
+      height: 14px;
+      border-width: 1px;
+    }
   }
 </style>
